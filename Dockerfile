@@ -1,29 +1,26 @@
-FROM ubuntu:14.04
-MAINTAINER Takayuki Shimizukawa shimizukawa@gmail.com
+FROM ubuntu:20.04
+MAINTAINER jlj7@protonmail.com
 
-# environment
+# Environment
 ENV DEBIAN_FRONTEND noninteractive
 
-# update
+# System update
 RUN apt-get update && apt-get -y upgrade
 
-# ruby related packages for td-agent
+# Ruby-related packages for td-agent
 RUN apt-get -y install curl libcurl4-openssl-dev ruby ruby-dev make
 
-# install fluentd td-agent
-RUN curl -L http://toolbelt.treasuredata.com/sh/install-ubuntu-trusty-td-agent2.sh | sh
+# Install td-agent v4
+curl -L https://toolbelt.treasuredata.com/sh/install-ubuntu-focal-td-agent4.sh | sh
 
-# clean cache files
+# Clean cache files
 RUN apt-get clean && rm -rf /var/cache/apt/archives/* /var/lib/apt/lists/*
 
-# install fluentd plugins
-RUN /opt/td-agent/embedded/bin/fluent-gem install --no-ri --no-rdoc \
-    fluent-plugin-elasticsearch \
-    fluent-plugin-record-modifier \
-    fluent-plugin-exclude-filter
+# Install fluentd plugins
+RUN /opt/td-agent/embedded/bin/fluent-gem install --no-document \
+  fluent-gem install fluent-plugin-splunk-enterprise
 
-
-# add conf
+# Add conf
 ADD ./etc/fluentd /etc/fluentd
 
 CMD /etc/init.d/td-agent stop && /opt/td-agent/embedded/bin/fluentd -c /etc/fluentd/fluent.conf
